@@ -173,6 +173,9 @@
     if (action === "deleteSite") {
       return { action, user, siteId: payload.siteId };
     }
+    if (action === "login") {
+      return { action, email: payload.email, password: payload.password };
+    }
     return { action, user, data: payload };
   }
 
@@ -255,7 +258,7 @@
     if (!data.success) {
       if (isAdminAction(action)) console.log("Current user:", user);
       const message = data.error || data.message || "NEMS API request failed.";
-      throw new Error(`${message} Current role: ${user?.role}, email: ${user?.email}`);
+      throw new Error(action === "login" ? message : `${message} Current role: ${user?.role}, email: ${user?.email}`);
     }
     return data;
   }
@@ -317,6 +320,16 @@
       writeStore(SITE_KEY, sites.filter((item) => item.siteId !== payload.siteId));
       return { success: true };
     }
+    if (action === "login") {
+      const demoUsers = [
+        { userId: "001", name: "NAGA Administrator", email: "admin@naga.local", password: "123456", role: "ADMIN" },
+        { userId: "002", name: "NAGA Viewer", email: "viewer@naga.local", password: "123456", role: "VIEWER" }
+      ];
+      const match = demoUsers.find((user) => user.email === String(payload.email || "").trim().toLowerCase() && user.password === payload.password);
+      if (!match) return { success: false, error: "Invalid email or password." };
+      const { password, ...user } = match;
+      return { success: true, data: user };
+    }
 
     throw new Error(`Unsupported action: ${action}`);
   }
@@ -339,6 +352,7 @@
     getAllSites: () => cachedRequest("sites", "getSites"),
     addSite: (site) => request("addSite", { site }).then((result) => { cacheClear("sites"); return result; }),
     updateSite: (site) => request("updateSite", { site }).then((result) => { cacheClear("sites"); return result; }),
-    deleteSite: (siteId) => request("deleteSite", { siteId }).then((result) => { cacheClear("sites"); return result; })
+    deleteSite: (siteId) => request("deleteSite", { siteId }).then((result) => { cacheClear("sites"); return result; }),
+    login: (email, password) => request("login", { email, password })
   };
 })();

@@ -3,6 +3,7 @@ const CONFIG = {
   EQUIPMENT_SHEET: "Equipment",
   MAINTENANCE_SHEET: "Maintenance",
   SITES_SHEET: "Sites",
+  USERS_SHEET: "Users",
   DRIVE_FOLDER_NAME: "NAGA Equipment Photos",
   ADMIN_EMAILS: ["admin@naga.local"]
 };
@@ -47,6 +48,15 @@ const SITE_HEADERS = [
   "remarks",
   "createdAt",
   "updatedAt"
+];
+
+const USERS_HEADERS = [
+  "userId",
+  "name",
+  "email",
+  "password",
+  "role",
+  "status"
 ];
 
 function doGet(event) {
@@ -100,6 +110,7 @@ function doPost(event) {
     if (action === "addSite") return jsonResponse(true, addSite(request.site || request.data));
     if (action === "updateSite") return jsonResponse(true, updateSite(request.site || request.data));
     if (action === "deleteSite") return jsonResponse(true, deleteSite(request.siteId || (request.data && request.data.siteId)));
+    if (action === "login") return jsonResponse(true, loginUser(request));
     return jsonResponse(false, null, "Unknown POST action.");
   } catch (error) {
     return jsonResponse(false, null, error.message);
@@ -111,6 +122,7 @@ function setupNemsDatabase() {
   ensureSheet(spreadsheet, CONFIG.EQUIPMENT_SHEET, EQUIPMENT_HEADERS);
   ensureSheet(spreadsheet, CONFIG.MAINTENANCE_SHEET, MAINTENANCE_HEADERS);
   ensureSheet(spreadsheet, CONFIG.SITES_SHEET, SITE_HEADERS);
+  ensureSheet(spreadsheet, CONFIG.USERS_SHEET, USERS_HEADERS);
   getRootPhotoFolder();
 }
 
@@ -303,6 +315,35 @@ function nextSiteId(rows) {
     return isNaN(value) ? highest : Math.max(highest, value);
   }, 0);
   return "SITE-" + String(max + 1).padStart(4, "0");
+}
+
+function loginUser(request) {
+  const email = String((request && request.email) || "").trim().toLowerCase();
+  const password = String((request && request.password) || "");
+
+  if (!email || !password) {
+    throw new Error("Email and password are required.");
+  }
+
+  const users = readRows(CONFIG.USERS_SHEET, USERS_HEADERS);
+  const match = users.find(function(user) {
+    return String(user.email || "").trim().toLowerCase() === email && String(user.password || "") === password;
+  });
+
+  if (!match) {
+    throw new Error("Invalid email or password.");
+  }
+
+  if (String(match.status || "Active").trim().toLowerCase() !== "active") {
+    throw new Error("This account is disabled. Contact an administrator.");
+  }
+
+  return {
+    userId: match.userId,
+    name: match.name,
+    email: match.email,
+    role: match.role
+  };
 }
 
 function isAdmin(user) {

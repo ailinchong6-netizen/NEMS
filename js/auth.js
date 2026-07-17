@@ -15,7 +15,8 @@
     return {
       name: user.name || "",
       email: String(user.email || "").trim().toLowerCase(),
-      role: String(user.role || "VIEWER").trim().toUpperCase()
+      role: String(user.role || "VIEWER").trim().toUpperCase(),
+      token: user.token || ""
     };
   }
 
@@ -40,6 +41,10 @@
   }
 
   function signOut() {
+    const user = getUser();
+    if (user?.token && window.NEMS_API?.logout) {
+      window.NEMS_API.logout(user.token).catch(() => {});
+    }
     localStorage.removeItem(AUTH_KEY);
     window.location.href = "index.html";
   }
@@ -69,7 +74,7 @@
   }
 
   function requireAuth() {
-    const publicPage = location.pathname.endsWith("/") || location.pathname.endsWith("index.html") || location.pathname.endsWith("login.html");
+    const publicPage = location.pathname.endsWith("/") || location.pathname.endsWith("index.html");
     const user = getUser();
     if (!publicPage && !user) {
       window.location.href = "index.html";

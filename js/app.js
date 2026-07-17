@@ -58,6 +58,29 @@
     document.querySelectorAll("[data-demo-login]").forEach((button) => {
       button.addEventListener("click", () => window.NEMS_AUTH.loginDemo(button.dataset.demoLogin));
     });
+    document.getElementById("loginForm")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const errorBox = document.getElementById("loginError");
+      const submitBtn = document.getElementById("loginBtn");
+      if (errorBox) errorBox.hidden = true;
+      if (submitBtn) submitBtn.disabled = true;
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const { data } = await window.NEMS_API.login(email, password);
+        window.NEMS_AUTH.setUser(data);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        if (errorBox) {
+          errorBox.textContent = error.message;
+          errorBox.hidden = false;
+        } else {
+          alert(error.message);
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
   }
 
   function applyRole(user) {

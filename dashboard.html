@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1E3A5F">
+  <title>Dashboard · NEMS</title>
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="dashboard">
+  <header class="app-header">
+    <a class="header-brand" href="dashboard.html">
+      <img src="assets/logo.svg" alt="" class="header-logo">
+      <span><strong>NAGA</strong><small>Equipment Management System</small></span>
+    </a>
+    <button class="icon-button" id="installBtn" type="button" hidden title="Install app">Install</button>
+  </header>
+
+  <main class="app-main">
+    <section class="page-title">
+      <p class="eyebrow">Dashboard</p>
+      <h1>Equipment Overview</h1>
+    </section>
+
+    <section class="stats-grid" id="dashboardStats" aria-live="polite"></section>
+
+    <section class="section-row">
+      <div>
+        <h2>Recent Equipment</h2>
+        <p class="muted">Latest assets updated in the NAGA database.</p>
+      </div>
+      <a class="text-action" href="equipment.html">View all</a>
+    </section>
+    <section class="equipment-list compact" id="recentEquipment"></section>
+
+    <section class="section-row">
+      <div>
+        <h2>Sites</h2>
+        <p class="muted">Active project sites tracked in NAGA.</p>
+      </div>
+      <a class="text-action" href="site.html">View all</a>
+    </section>
+    <section class="equipment-list compact" id="recentSites"></section>
+    <section class="admin-only">
+      <a class="secondary-action" href="add-site.html">+ Add Site</a>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <a href="dashboard.html" class="active">Home</a>
+    <a href="equipment.html">Equipment</a>
+    <a href="equipment.html?focus=search">Search</a>
+    <a href="profile.html">Profile</a>
+  </nav>
+
+  <footer class="app-footer">© 2026 NAGA · Internal Use Only</footer>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NAGA">
+  <rect width="512" height="512" rx="72" fill="#1E3A5F"/>
+  <path d="M96 360 206 112h78l132 248h-76l-25-51H181l-23 51H96Z" fill="#F5A623"/>
+  <path d="M207 250h82l-43-86-39 86Z" fill="#1E3A5F"/>
+  <path d="M118 388h276v36H118z" fill="#fff" opacity=".9"/>
+</svg>

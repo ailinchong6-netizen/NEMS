@@ -145,14 +145,19 @@
 
   function postBodyFor(action, payload) {
     const user = requestUser();
+    const token = currentUser()?.token || "";
+
+    if (action === "login") {
+      return { action, email: payload.email, password: payload.password };
+    }
+
+    let body;
     if (action === "addEquipment" || action === "updateEquipment") {
-      return { action, user, equipment: payload.equipment };
-    }
-    if (action === "deleteEquipment") {
-      return { action, user, equipmentId: payload.equipmentId };
-    }
-    if (action === "uploadPhoto") {
-      return {
+      body = { action, user, equipment: payload.equipment };
+    } else if (action === "deleteEquipment") {
+      body = { action, user, equipmentId: payload.equipmentId };
+    } else if (action === "uploadPhoto") {
+      body = {
         action,
         user,
         equipmentId: payload.equipmentId,
@@ -160,23 +165,21 @@
         mimeType: payload.mimeType,
         photoData: payload.photoData
       };
+    } else if (action === "addMaintenance" || action === "updateMaintenance") {
+      body = { action, user, record: payload.record };
+    } else if (action === "deleteMaintenance") {
+      body = { action, user, maintenanceId: payload.maintenanceId };
+    } else if (action === "addSite" || action === "updateSite") {
+      body = { action, user, site: payload.site };
+    } else if (action === "deleteSite") {
+      body = { action, user, siteId: payload.siteId };
+    } else if (action === "logout") {
+      body = { action };
+    } else {
+      body = { action, user, data: payload };
     }
-    if (action === "addMaintenance" || action === "updateMaintenance") {
-      return { action, user, record: payload.record };
-    }
-    if (action === "deleteMaintenance") {
-      return { action, user, maintenanceId: payload.maintenanceId };
-    }
-    if (action === "addSite" || action === "updateSite") {
-      return { action, user, site: payload.site };
-    }
-    if (action === "deleteSite") {
-      return { action, user, siteId: payload.siteId };
-    }
-    if (action === "login") {
-      return { action, email: payload.email, password: payload.password };
-    }
-    return { action, user, data: payload };
+
+    return { ...body, token };
   }
 
   function readStore(key, fallback) {
@@ -221,11 +224,13 @@
     }
 
     const user = requestUser();
+    const token = currentUser()?.token || "";
     const method = action.startsWith("get") ? "GET" : "POST";
     const url = new URL(CONFIG.API_URL);
     url.searchParams.set("action", action);
     if (method === "GET") {
       Object.entries(payload).forEach(([key, value]) => url.searchParams.set(key, value));
+      url.searchParams.set("token", token);
     }
     if (action === "getEquipmentById") {
       console.log("GET EQUIPMENT URL:", url.toString());
@@ -353,6 +358,7 @@
     addSite: (site) => request("addSite", { site }).then((result) => { cacheClear("sites"); return result; }),
     updateSite: (site) => request("updateSite", { site }).then((result) => { cacheClear("sites"); return result; }),
     deleteSite: (siteId) => request("deleteSite", { siteId }).then((result) => { cacheClear("sites"); return result; }),
-    login: (email, password) => request("login", { email, password })
+    login: (email, password) => request("login", { email, password }),
+    logout: () => request("logout")
   };
 })();

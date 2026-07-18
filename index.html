@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="auth-page">
+<body class="auth-page" data-page="login">
   <main class="login-shell">
     <section class="brand-panel">
       <img src="assets/logo.svg" alt="NAGA logo" class="brand-logo">
@@ -21,19 +21,18 @@
 
     <section class="login-panel" aria-labelledby="login-title">
       <h2 id="login-title">Sign in</h2>
-      <p>Use your approved Google account to access NEMS.</p>
-      <button class="primary-action" id="googleSignInBtn" type="button">
-        <span class="button-icon">G</span>
-        Continue with Google
-      </button>
-      <div class="demo-login">
-        <p>Setup mode</p>
-        <div class="demo-grid">
-          <button class="secondary-action" data-demo-login="ADMIN" type="button">Admin Demo</button>
-          <button class="secondary-action" data-demo-login="VIEWER" type="button">Viewer Demo</button>
+      <p>Use your NEMS account to access the system.</p>
+
+      <form id="loginForm" class="entity-form" novalidate>
+        <label><span>Email</span><input id="email" type="email" autocomplete="username" required></label>
+        <label><span>Password</span><input id="password" type="password" autocomplete="current-password" required></label>
+        <p id="loginError" class="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="primary-action" id="loginBtn" type="submit">Login</button>
         </div>
-      </div>
-      <p class="fine-print">Connect Google Identity Services in <code>js/auth.js</code> for production login.</p>
+      </form>
+
+      <p class="fine-print">Trouble signing in? Contact an administrator to check your account in the Users sheet.</p>
     </section>
   </main>
 

@@ -2,6 +2,8 @@
   const STATUS = ["Available", "In Use", "Under Maintenance", "Broken", "Disposed"];
   const CONDITION = ["Excellent", "Good", "Fair", "Poor"];
   const SITE_STATUS = ["Active", "Inactive", "Completed"];
+  const USER_ROLES = ["ADMIN", "VIEWER"];
+  const USER_STATUS = ["Active", "Inactive"];
   let SITES = ["SCC Bertam", "Tanah Merah", "Kuantan", "Batu 3 MHC", "Others"];
   let SITE_RECORDS = [];
   const CATEGORIES = ["Generator", "Excavator", "Heavy Equipment", "Compressor", "Welding Machine", "Air Compressor", "Vehicle", "Power Tools", "Scaffolding", "Safety Equipment", "Others"];
@@ -28,6 +30,9 @@
     if (page === "site-detail") renderSiteDetail();
     if (page === "site-add") renderSiteForm();
     if (page === "site-edit") renderSiteForm(true);
+    if (page === "users") renderUsersList();
+    if (page === "user-add") renderUserForm();
+    if (page === "user-edit") renderUserForm(true);
   }
 
   function registerServiceWorker() {
@@ -86,7 +91,7 @@
   function applyRole(user) {
     const admin = window.NEMS_AUTH.isAdmin(user);
     document.querySelectorAll(".admin-only").forEach((element) => element.classList.toggle("hidden", !admin));
-    if (!admin && ["add", "edit", "site-add", "site-edit"].includes(document.body.dataset.page)) {
+    if (!admin && ["add", "edit", "site-add", "site-edit", "users", "user-add", "user-edit"].includes(document.body.dataset.page)) {
       window.location.href = "equipment.html";
     }
   }
@@ -507,6 +512,97 @@
     if (!confirm(`Delete site ${siteId}? This action cannot be undone.`)) return;
     await window.NEMS_API.deleteSite(siteId);
     window.location.href = "site.html";
+  }
+
+  async function renderUsersList() {
+    const { data } = await window.NEMS_API.getUsers();
+    const search = document.getElementById("userSearchInput");
+    const update = () => {
+      const term = (search?.value || "").trim().toLowerCase();
+      const filtered = data.filter((user) => {
+        const text = [user.userId, user.name, user.email, user.role].join(" ").toLowerCase();
+        return !term || text.includes(term);
+      });
+      document.getElementById("userList").innerHTML = filtered.map(userCardTemplate).join("") || emptyState("No users found.");
+    };
+    search?.addEventListener("input", update);
+    update();
+  }
+
+  async function renderUserForm(edit = false) {
+    const form = document.getElementById("userForm");
+    const params = new URLSearchParams(location.search);
+    const userId = params.get("userId") || params.get("id");
+    let existing = {};
+    if (edit) {
+      const { data } = await window.NEMS_API.getUsers();
+      existing = (data || []).find((item) => item.userId === userId) || {};
+    }
+    form.innerHTML = `
+      <div class="form-grid">
+        ${field("userId", "User ID", existing.userId, false)}
+        ${field("name", "Full Name", existing.name, true)}
+        ${field("email", "Email", existing.email, true, "email")}
+        ${selectField("role", "Role", USER_ROLES, existing.role || "VIEWER")}
+        ${selectField("status", "Status", USER_STATUS, existing.status || "Active")}
+      </div>
+      <label>
+        <span>${edit ? "New Password (leave blank to keep current)" : "Password"}</span>
+        <input name="password" type="password" autocomplete="new-password" ${edit ? "" : "required"}>
+      </label>
+      <div class="form-actions">
+        <button class="primary-action" type="submit">${edit ? "Update" : "Save"} User</button>
+        ${edit ? '<button class="danger-action" id="deleteUserBtn" type="button">Delete</button>' : ""}
+      </div>
+    `;
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const formData = Object.fromEntries(new FormData(form).entries());
+        if (edit && !formData.password) delete formData.password;
+        const payload = { ...existing, ...formData };
+        const result = edit ? await window.NEMS_API.updateUser(payload) : await window.NEMS_API.addUser(payload);
+        const savedUser = result?.data || {};
+        const savedUserId = savedUser.userId || payload.userId;
+        if (!savedUserId) {
+          throw new Error("User saved, but backend did not return a userId.");
+        }
+        alert("User saved successfully");
+        window.location.href = "users.html";
+      } catch (error) {
+        alert(`Save failed: ${error.message}`);
+        console.error(error);
+      }
+    });
+
+    document.getElementById("deleteUserBtn")?.addEventListener("click", () => {
+      deleteUserAndRedirect(existing.userId);
+    });
+  }
+
+  async function deleteUserAndRedirect(userId) {
+    if (!userId) return;
+    if (!confirm(`Delete user ${userId}? This action cannot be undone.`)) return;
+    try {
+      await window.NEMS_API.deleteUser(userId);
+      window.location.href = "users.html";
+    } catch (error) {
+      alert(`Delete failed: ${error.message}`);
+    }
+  }
+
+  function userCardTemplate(user) {
+    return `
+      <a class="equipment-card" href="edit-user.html?userId=${encodeURIComponent(user.userId)}">
+        <div class="equipment-card-body">
+          <span class="badge ${slug(user.status || "Active")}">${escapeHtml(user.status || "Active")}</span>
+          <h3>${escapeHtml(user.name)}</h3>
+          <p class="meta-line">${escapeHtml(user.email)}</p>
+          <p class="meta-line">${escapeHtml(user.role)}</p>
+        </div>
+      </a>
+    `;
   }
 
   function siteCardTemplate(site) {

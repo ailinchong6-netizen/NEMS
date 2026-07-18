@@ -4,36 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1E3A5F">
-  <title>Profile · NEMS</title>
+  <title>Add User · NEMS</title>
   <link rel="manifest" href="assets/manifest.json">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body data-page="profile">
+<body data-page="user-add">
   <header class="app-header">
-    <a class="header-brand" href="dashboard.html">
+    <a class="header-brand" href="users.html">
       <img src="assets/logo.svg" alt="" class="header-logo">
-      <span><strong>NAGA</strong><small>User Profile</small></span>
+      <span><strong>NAGA</strong><small>Add User</small></span>
     </a>
   </header>
 
   <main class="app-main">
     <section class="page-title">
-      <p class="eyebrow">Account</p>
-      <h1>Profile</h1>
+      <p class="eyebrow">Admin</p>
+      <h1>Add User</h1>
     </section>
-    <section class="profile-card" id="profileCard"></section>
-    <section class="admin-only">
-      <a class="secondary-action" href="users.html">Manage Users</a>
-    </section>
+    <form class="entity-form" id="userForm"></form>
   </main>
 
   <nav class="bottom-nav" aria-label="Primary">
     <a href="dashboard.html">Home</a>
     <a href="equipment.html">Equipment</a>
     <a href="equipment.html?focus=search">Search</a>
-    <a href="profile.html" class="active">Profile</a>
+    <a href="profile.html">Profile</a>
   </nav>
 
   <footer class="app-footer">© 2026 NAGA · Internal Use Only</footer>

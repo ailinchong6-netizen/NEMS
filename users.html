@@ -4,36 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1E3A5F">
-  <title>Profile · NEMS</title>
+  <title>Users · NEMS</title>
   <link rel="manifest" href="assets/manifest.json">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body data-page="profile">
+<body data-page="users">
   <header class="app-header">
     <a class="header-brand" href="dashboard.html">
       <img src="assets/logo.svg" alt="" class="header-logo">
-      <span><strong>NAGA</strong><small>User Profile</small></span>
+      <span><strong>NAGA</strong><small>Equipment Management System</small></span>
     </a>
+    <a class="admin-only header-action" href="add-user.html">Add</a>
   </header>
 
   <main class="app-main">
     <section class="page-title">
-      <p class="eyebrow">Account</p>
-      <h1>Profile</h1>
+      <p class="eyebrow">Admin</p>
+      <h1>User Accounts</h1>
     </section>
-    <section class="profile-card" id="profileCard"></section>
-    <section class="admin-only">
-      <a class="secondary-action" href="users.html">Manage Users</a>
+
+    <section class="filter-panel">
+      <label class="search-field">
+        <span>Search</span>
+        <input id="userSearchInput" type="search" placeholder="Name, email, role">
+      </label>
     </section>
+
+    <section class="equipment-list" id="userList" aria-live="polite"></section>
   </main>
 
   <nav class="bottom-nav" aria-label="Primary">
     <a href="dashboard.html">Home</a>
     <a href="equipment.html">Equipment</a>
     <a href="equipment.html?focus=search">Search</a>
-    <a href="profile.html" class="active">Profile</a>
+    <a href="profile.html">Profile</a>
   </nav>
 
   <footer class="app-footer">© 2026 NAGA · Internal Use Only</footer>
